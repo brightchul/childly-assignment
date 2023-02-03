@@ -1,0 +1,105 @@
+<html>
+  <head>
+    <style>
+      #frame {
+        position: relative;
+        border: 1px solid black;
+        width: 200px;
+        height: 30px;
+      }
+      #handle {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: black;
+        cursor: pointer;
+        transition: left 0.15s ease-out;
+      }
+      #handle.move {
+        transition-duration: 0s;
+        -webkit-transition-duration: 0s;
+      }
+      #target {
+        position: absolute;
+        z-index: -1;
+        border-radius: 10px;
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(red 25%, white 25% 100%);
+        border: 1px solid red;
+        box-sizing: border-box;
+        pointer-events: none;
+      }
+      #message.success {
+        color: forestgreen;
+      }
+      #message.success::after {
+        content: "성공";
+      }
+      #message.failed {
+        color: red;
+      }
+      #message.failed::after {
+        content: "실패";
+      }
+    </style>
+  </head>
+  <body>
+    <p>
+      <button id="reset">초기화</button>
+    </p>
+    <div id="frame">
+      <div id="handle"></div>
+      <div id="target" style="right: 5px; top: 5px"></div>
+    </div>
+    <p id="message"></p>
+    <script>
+      var left = 0;
+      // 초기화
+      document.getElementById("reset").addEventListener("mousedown", () => {
+        left = 0;
+        document.getElementById("message").className = "";
+        document.getElementById("handle").style = `left: ${left}px`;
+      });
+
+      // 핸들 이동 시작
+      document.getElementById("handle").addEventListener("mousedown", () => {
+        document.getElementById("handle").className = "move";
+      });
+
+      // 핸들 이동
+      document.getElementById("frame").addEventListener("mousemove", (e) => {
+        if (document.getElementById("handle").className != "move") {
+          return;
+        }
+        const frameX = document.getElementById("frame").offsetLeft;
+        const frameWidth = 200;
+        const x = Math.min(
+          Math.max(e.clientX - 15 - frameX, 0),
+          frameWidth - 30
+        );
+        left = x;
+        document.getElementById("handle").style = `left: ${left}px`;
+      });
+
+      // 핸들 이동 종료, 테스트 판정
+      document.addEventListener("mouseup", () => {
+        if (document.getElementById("handle").className != "move") {
+          return;
+        }
+        document.getElementById("handle").className = "";
+        // 성공 판정
+        if (left > 165) {
+          document.getElementById("message").className = "success";
+        }
+        // 실패 판정
+        else {
+          document.getElementById("message").className = "failed";
+          left = 0;
+          document.getElementById("handle").style = `left: ${left}px`;
+        }
+      });
+    </script>
+  </body>
+</html>
