@@ -4,9 +4,10 @@
       #frame {
         position: relative;
         border: 1px solid black;
-        width: 200px;
-        height: 30px;
+        width: 300px; /* origin : 200 */
+        height: 300px; /* origin: 30 */
       }
+
       #handle {
         position: absolute;
         width: 30px;
@@ -14,7 +15,9 @@
         border-radius: 15px;
         background-color: black;
         cursor: pointer;
-        transition: left 0.15s ease-out;
+        transition-property: left, top;
+        transition-duration: 0.15s;
+        transition-timing-function: ease-out;
       }
       #handle.move {
         transition-duration: 0s;
@@ -51,53 +54,168 @@
     </p>
     <div id="frame">
       <div id="handle"></div>
-      <div id="target" style="right: 5px; top: 5px"></div>
+      <div id="target"></div>
     </div>
     <p id="message"></p>
     <script>
-      var left = 0;
+      const frameWidth = 300;
+      const frameHeight = 300;
+      const handleWidth = 30;
+      const targetWidth = 20;
+
+      let resetHandleLeft = 0;
+      let resetHandleTop = 0;
+
+      let handleLeft = 0;
+      let handleTop = 0;
+
+      let targetLeft = 0;
+      let targetTop = 0;
+
+      function checkCollision(
+        handleLeft,
+        handleTop,
+        targetLeft,
+        targetTop,
+        distance
+      ) {
+        const handleCenterLeft = handleLeft + handleWidth / 2;
+        const handleCenterTop = handleTop + handleWidth / 2;
+
+        const targetCenterLeft = targetLeft + targetWidth / 2;
+        const targetCenterTop = targetTop + targetWidth / 2;
+
+        const result = Math.sqrt(
+          (handleCenterLeft - targetCenterLeft) ** 2 +
+            (handleCenterTop - targetCenterTop) ** 2
+        );
+        return result <= distance;
+      }
+
+      const domFrame = document.getElementById("frame");
+      const domReset = document.getElementById("reset");
+      const domMessage = document.getElementById("message");
+      const domTarget = document.getElementById("target");
+      const domHandle = document.getElementById("handle");
+
+      function generateTargetPosition() {
+        const frameX = domFrame.offsetLeft;
+        const frameY = domFrame.offsetTop;
+
+        let randomX = (Math.random() * frameWidth) | 0;
+        let randomY = (Math.random() * frameHeight) | 0;
+        const minX = 0;
+        const maxX = frameWidth - targetWidth;
+        const minY = 0;
+        const maxY = frameWidth - targetWidth;
+
+        while (
+          randomX < minX ||
+          maxX < randomX ||
+          randomY < minY ||
+          maxY < randomY ||
+          checkCollision(
+            resetHandleLeft,
+            resetHandleTop,
+            randomX,
+            randomY,
+            (handleWidth + targetWidth) / 2
+          )
+        ) {
+          randomX = (Math.random() * frameWidth) | 0;
+          randomY = (Math.random() * frameWidth) | 0;
+        }
+
+        console.log();
+        return [randomX, randomY];
+      }
+
+      function generateHandlePosition() {
+        const [minX, maxX] = [0, frameWidth - handleWidth];
+        const [minY, maxY] = [0, frameHeight - handleWidth];
+
+        const [randomX, randomY] = [
+          [minX, minY],
+          [maxX, minY],
+          [maxX, maxY],
+          [minX, maxY],
+        ][(Math.random() * 4) | 0];
+
+        return [randomX, randomY];
+      }
+
+      document.body.onload = () => {
+        const [handleLeft, handleTop] = generateHandlePosition();
+        resetHandleLeft = handleLeft;
+        resetHandleTop = handleTop;
+        domMessage.className = "";
+        domHandle.style = `left: ${handleLeft}px; top: ${handleTop}px`;
+
+        const [_targetLeft, _targetTop] = generateTargetPosition();
+        targetLeft = _targetLeft;
+        targetTop = _targetTop;
+        domTarget.style = `left: ${targetLeft}px; top: ${targetTop}px`;
+      };
+
       // 초기화
-      document.getElementById("reset").addEventListener("mousedown", () => {
-        left = 0;
-        document.getElementById("message").className = "";
-        document.getElementById("handle").style = `left: ${left}px`;
+      domReset.addEventListener("mousedown", () => {
+        domMessage.className = "";
+        const [resetLeft, resetTop] = generateHandlePosition();
+        resetHandleLeft = resetLeft;
+        resetHandleTop = resetTop;
+        domHandle.style = `left: ${resetHandleLeft}px; top: ${resetHandleTop}px`;
+
+        // target
+        const [_targetLeft, _targetTop] = generateTargetPosition();
+        targetLeft = _targetLeft;
+        targetTop = _targetTop;
+        domTarget.style = `left: ${targetLeft}px; top: ${targetTop}px`;
       });
 
       // 핸들 이동 시작
-      document.getElementById("handle").addEventListener("mousedown", () => {
-        document.getElementById("handle").className = "move";
+      domHandle.addEventListener("mousedown", () => {
+        domHandle.className = "move";
       });
 
       // 핸들 이동
-      document.getElementById("frame").addEventListener("mousemove", (e) => {
-        if (document.getElementById("handle").className != "move") {
+      domFrame.addEventListener("mousemove", (e) => {
+        if (domHandle.className != "move") {
           return;
         }
-        const frameX = document.getElementById("frame").offsetLeft;
-        const frameWidth = 200;
+        const frameX = domFrame.offsetLeft;
+        const frameY = domFrame.offsetTop;
+
         const x = Math.min(
-          Math.max(e.clientX - 15 - frameX, 0),
-          frameWidth - 30
+          Math.max(e.clientX - handleWidth / 2 - frameX, 0),
+          frameWidth - handleWidth
         );
-        left = x;
-        document.getElementById("handle").style = `left: ${left}px`;
+        handleLeft = x;
+
+        const y = Math.min(
+          Math.max(e.clientY - handleWidth / 2 - frameY, 0),
+          frameHeight - handleWidth
+        );
+        handleTop = y;
+
+        domHandle.style = `left: ${handleLeft}px; top: ${handleTop}px`;
       });
 
       // 핸들 이동 종료, 테스트 판정
       document.addEventListener("mouseup", () => {
-        if (document.getElementById("handle").className != "move") {
+        if (domHandle.className != "move") {
           return;
         }
-        document.getElementById("handle").className = "";
+        domHandle.className = "";
         // 성공 판정
-        if (left > 165) {
-          document.getElementById("message").className = "success";
+        if (checkCollision(handleLeft, handleTop, targetLeft, targetTop, 18)) {
+          domMessage.className = "success";
         }
         // 실패 판정
         else {
-          document.getElementById("message").className = "failed";
-          left = 0;
-          document.getElementById("handle").style = `left: ${left}px`;
+          domMessage.className = "failed";
+          handleLeft = resetHandleLeft;
+          handleTop = resetHandleTop;
+          domHandle.style = `left: ${handleLeft}px; top: ${handleTop}px`;
         }
       });
     </script>
