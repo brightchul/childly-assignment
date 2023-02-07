@@ -5,9 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "build-exe": "pkg . --output p1.exe",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": "index.js",
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "pkg": "^5.8.0"
+  }
 }
