@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "build-exe": "pkg . --output p1.exe",
+    "build-exe": "pkg . --output P3.exe",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": "index.js",
