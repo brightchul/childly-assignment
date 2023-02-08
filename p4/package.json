@@ -1,18 +1,16 @@
 {
-  "name": "algorithm",
+  "name": "p4",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "build-exe": "pkg . --output p1.exe",
+    "start": "live-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "bin": "index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "pkg": "^5.8.0"
+  "devDependencies": {
+    "live-server": "^1.2.2"
   }
 }

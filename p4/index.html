@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <style>
+      #frame {
+        position: relative;
+        border: 1px solid black;
+        width: 300px; /* origin : 200 */
+        height: 300px; /* origin: 30 */
+      }
+
+      #handle {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: black;
+        cursor: pointer;
+        transition-property: left, top;
+        transition-duration: 0.15s;
+        transition-timing-function: ease-out;
+      }
+      #handle.move {
+        transition-duration: 0s;
+        -webkit-transition-duration: 0s;
+      }
+      #target {
+        position: absolute;
+        z-index: -1;
+        border-radius: 10px;
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(red 25%, white 25% 100%);
+        border: 1px solid red;
+        box-sizing: border-box;
+        pointer-events: none;
+      }
+      #message.success {
+        color: forestgreen;
+      }
+      #message.success::after {
+        content: "성공";
+      }
+      #message.failed {
+        color: red;
+      }
+      #message.failed::after {
+        content: "실패";
+      }
+    </style>
+  </head>
+  <body>
+    <p>
+      <button id="reset">초기화</button>
+    </p>
+    <div id="frame">
+      <div id="handle"></div>
+      <div id="target"></div>
+    </div>
+    <p id="message"></p>
+    <script src="./index.js" type="module"></script>
+  </body>
+</html>
